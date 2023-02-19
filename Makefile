@@ -11,7 +11,7 @@ OUTDIR = obj
 WRAPPER = .
 #USE_DSPLIB = YES
 USE_MATHLIB = NO
-DEBUG = NO
+DEBUG = YES
 
 CFLAGS = 
 SRC = 
@@ -37,6 +37,7 @@ endif
 
 ifeq ($(MCU), cortex-m3)
 STARTUP = $(WRAPPER)/startup/stm32f10x
+USER = $(WRAPPER)/user
 STD_DRIVER = $(WRAPPER)/Libraries_stm32f10x/STM32F10x_StdPeriph_Driver
 CMSIS = $(WRAPPER)/Libraries_stm32f10x/CMSIS
 # OPENOCD_FLAGS = -f ../stlink-v2.cfg -f ../stm32f1x_stlink.cfg
@@ -84,14 +85,13 @@ LINKER_SCRIPT = stm32f10x.ld
 SRC += $(STARTUP)/startup_stm32f10x_$(MODEL).s
 # SRC += $(wildcard $(WRAPPER)/smart_core/driver/STM32F1xx/*.c)
 SRC += $(CMSIS)/CM3/CoreSupport/core_cm3.c
-SRC += $(STARTUP)/system_stm32f10x.c
-SRC += $(STARTUP)/stm32f10x_it.c
+# SRC += $(STARTUP)/system_stm32f10x.c
+# SRC += $(STARTUP)/stm32f10x_it.c
 
 # SRC += $(wildcard $(WRAPPER)/smart_core/driver/STM32F1xx/STM32_USB-FS-Device_Driver/src/*.c)
 endif
 
-SRC += $(WRAPPER)/user/main.c
-# SRC += $(wildcard $(STARTUP)/*.c)
+SRC += $(wildcard $(STARTUP)/*.c)
 
 # SRC += $(STD_DRIVER)/src/misc.c
 # SRC += $(STD_DRIVER)/src/stm32f4xx_adc.c
@@ -113,6 +113,7 @@ SRC += $(STD_DRIVER)/src/stm32f10x_tim.c
 SRC += $(STD_DRIVER)/src/stm32f10x_usart.c
 SRC += $(STD_DRIVER)/src/stm32f10x_rcc.c
 
+SRC += $(wildcard $(USER)/*.c)
 SRC += $(wildcard ./*.c)
 #SRC += $(wildcard $(WRAPPER)/system/*.c)
 # SRC += $(wildcard $(WRAPPER)/smart_core/common/*.c)
@@ -135,6 +136,7 @@ SRC += $(wildcard ./*.c)
 
 EXTRAINCDIRS += $(STARTUP)/inc/
 EXTRAINCDIRS += $(STD_DRIVER)/inc/
+EXTRAINCDIRS += $(USER)/
 
 ifeq ($(MCU), cortex-m4)
 EXTRAINCDIRS += $(CMSIS)/Device/ST/STM32F4xx/Include/
@@ -160,7 +162,7 @@ endif
 # EXTRAINCDIRS += datas/inc/
 # EXTRAINCDIRS += $(WRAPPER)/system/inc/
 
-CFLAGS += -Os -fno-strict-aliasing
+CFLAGS += -Os 
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 
 CFLAGS += -mapcs-frame
@@ -168,7 +170,7 @@ CFLAGS += -fomit-frame-pointer
 CFLAGS += -ffast-math
 
 CFLAGS += -Wall
-# CFLAGS += -Werror
+CFLAGS += -Werror
 CFLAGS += -ffunction-sections -fdata-sections
 CFLAGS += -Wdouble-promotion
 CFLAGS += -std=gnu99
@@ -196,7 +198,7 @@ endif
 
 CFLAGS += -DSMART_SYSTEM_ID=1
 ifeq ($(DEBUG), YES)
-CFLAGS += -gc
+CFLAGS += -g
 endif
 
 # Linker flags.
