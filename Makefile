@@ -245,12 +245,12 @@ size: $(RESULT).elf
 	$(SIZE) $(RESULT).elf
 
 clean:
-	del -f $(RESULT).elf
-	del -f $(RESULT).bin
-	del -f $(RESULT).map
-	del -f $(RESULT).hex
-	del -f $(RESULT).lst
-	del -f obj/*.o
+	rm -f $(RESULT).elf
+	rm -f $(RESULT).bin
+	rm -f $(RESULT).map
+	rm -f $(RESULT).hex
+	rm -f $(RESULT).lst
+	rm -f obj/*.o
 erase:
 	st-flash erase
 
