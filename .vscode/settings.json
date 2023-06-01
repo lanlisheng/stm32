@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "hal_timer.h": "c",
+        "hal_led.h": "c"
+    }
+}

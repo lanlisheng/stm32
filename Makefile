@@ -32,12 +32,15 @@ STARTUP = $(WRAPPER)/startup/stm32f4xx
 STD_DRIVER = $(WRAPPER)/Libraries_stm32f40x/STM32F4xx_StdPeriph_Driver
 CMSIS = $(WRAPPER)/Libraries_stm32f40x/CMSIS
 USER = $(WRAPPER)/user
+OS = $(WRAPPER)/os
 # OPENOCD_FLAGS = -f ../stlink-v2.cfg -f ../stm32f4x_stlink.cfg
 endif
 
 ifeq ($(MCU), cortex-m3)
 STARTUP = $(WRAPPER)/startup/stm32f10x
 USER = $(WRAPPER)/user
+OS = $(WRAPPER)/os
+HAL_DRIVER = $(WRAPPER)/driver
 STD_DRIVER = $(WRAPPER)/Libraries_stm32f10x/STM32F10x_StdPeriph_Driver
 CMSIS = $(WRAPPER)/Libraries_stm32f10x/CMSIS
 # OPENOCD_FLAGS = -f ../stlink-v2.cfg -f ../stm32f1x_stlink.cfg
@@ -85,6 +88,7 @@ LINKER_SCRIPT = stm32f10x.ld
 SRC += $(STARTUP)/startup_stm32f10x_$(MODEL).s
 # SRC += $(wildcard $(WRAPPER)/smart_core/driver/STM32F1xx/*.c)
 SRC += $(CMSIS)/CM3/CoreSupport/core_cm3.c
+SRC += $
 # SRC += $(STARTUP)/system_stm32f10x.c
 # SRC += $(STARTUP)/stm32f10x_it.c
 
@@ -114,6 +118,7 @@ SRC += $(STD_DRIVER)/src/stm32f10x_usart.c
 SRC += $(STD_DRIVER)/src/stm32f10x_rcc.c
 
 SRC += $(wildcard $(USER)/*.c)
+SRC += $(wildcard $(OS)/*.c)
 SRC += $(wildcard ./*.c)
 #SRC += $(wildcard $(WRAPPER)/system/*.c)
 # SRC += $(wildcard $(WRAPPER)/smart_core/common/*.c)

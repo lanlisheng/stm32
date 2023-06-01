@@ -1,10 +1,3 @@
-/*
- * @creater:  lanlisheng
- * @since: 2023-02-18 21:30:58
- * @lastTime: 2023-02-19 22:52:39
- * @LastAuthor: lanlisheng
- * @文件相对于项目的路径: \stm32f405\user\main.c
- */
 // #include "stm32f4xx.h"
 #include "stm32f10x.h"
 void Delay(__IO uint32_t nCount);

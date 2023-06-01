@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "__CC_ARM",
+                "__IO"
+            ],
+            "macFrameworkPath": [
+                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"
+            ],
+            "compilerPath": "/Users/smartrobot/Tools/gcc-arm-none-eabi-5_4-2016q3/bin/arm-none-eabi-gcc",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}
