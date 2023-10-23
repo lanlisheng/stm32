@@ -32,14 +32,14 @@ STARTUP = $(WRAPPER)/startup/stm32f4xx
 STD_DRIVER = $(WRAPPER)/Libraries_stm32f40x/STM32F4xx_StdPeriph_Driver
 CMSIS = $(WRAPPER)/Libraries_stm32f40x/CMSIS
 USER = $(WRAPPER)/user
-OS = $(WRAPPER)/os
+# OS = $(WRAPPER)/os
 # OPENOCD_FLAGS = -f ../stlink-v2.cfg -f ../stm32f4x_stlink.cfg
 endif
 
 ifeq ($(MCU), cortex-m3)
 STARTUP = $(WRAPPER)/startup/stm32f10x
 USER = $(WRAPPER)/user
-OS = $(WRAPPER)/os
+# OS = $(WRAPPER)/os
 HAL_DRIVER = $(WRAPPER)/driver
 STD_DRIVER = $(WRAPPER)/Libraries_stm32f10x/STM32F10x_StdPeriph_Driver
 CMSIS = $(WRAPPER)/Libraries_stm32f10x/CMSIS
@@ -86,14 +86,13 @@ endif
 ifeq ($(MCU), cortex-m3)
 LINKER_SCRIPT = stm32f10x.ld
 SRC += $(STARTUP)/startup_stm32f10x_$(MODEL).s
-# SRC += $(wildcard $(WRAPPER)/smart_core/driver/STM32F1xx/*.c)
 SRC += $(CMSIS)/CM3/CoreSupport/core_cm3.c
-SRC += $
 # SRC += $(STARTUP)/system_stm32f10x.c
+# SRC += $(STARTUP)/smart_system.c
 # SRC += $(STARTUP)/stm32f10x_it.c
-
 # SRC += $(wildcard $(WRAPPER)/smart_core/driver/STM32F1xx/STM32_USB-FS-Device_Driver/src/*.c)
 endif
+
 
 SRC += $(wildcard $(STARTUP)/*.c)
 
@@ -118,7 +117,7 @@ SRC += $(STD_DRIVER)/src/stm32f10x_usart.c
 SRC += $(STD_DRIVER)/src/stm32f10x_rcc.c
 
 SRC += $(wildcard $(USER)/*.c)
-SRC += $(wildcard $(OS)/*.c)
+SRC += $(wildcard $(HAL_DRIVER)/*.c)
 SRC += $(wildcard ./*.c)
 #SRC += $(wildcard $(WRAPPER)/system/*.c)
 # SRC += $(wildcard $(WRAPPER)/smart_core/common/*.c)
@@ -142,6 +141,10 @@ SRC += $(wildcard ./*.c)
 EXTRAINCDIRS += $(STARTUP)/inc/
 EXTRAINCDIRS += $(STD_DRIVER)/inc/
 EXTRAINCDIRS += $(USER)/
+# EXTRAINCDIRS += $(OS)/
+EXTRAINCDIRS += $(WRAPPER)/driver/inc/
+EXTRAINCDIRS += $(WRAPPER)/user/
+
 
 ifeq ($(MCU), cortex-m4)
 EXTRAINCDIRS += $(CMSIS)/Device/ST/STM32F4xx/Include/
@@ -154,18 +157,18 @@ endif
 ifeq ($(MCU), cortex-m3)
 EXTRAINCDIRS += $(CMSIS)/CM3/DeviceSupport/ST/STM32F10x
 EXTRAINCDIRS += $(CMSIS)/CM3/CoreSupport/
-# EXTRAINCDIRS += $(WRAPPER)/smart_core/driver/STM32F1xx/inc/
+# EXTRAINCDIRS += $(HAL_DRIVER)/inc/
+# EXTRAINCDIRS += $(WRAPPER)/driver/inc/
 # EXTRAINCDIRS += $(WRAPPER)/smart_core/driver/STM32F1xx/STM32_USB-FS-Device_Driver/inc/
 endif
 
 # EXTRAINCDIRS += $(WRAPPER)/smart_core/common/inc/
-# EXTRAINCDIRS += $(WRAPPER)/smart_core/driver/inc/
+# EXTRAINCDIRS += $(WRAPPER)/driver/inc/
 # EXTRAINCDIRS += $(WRAPPER)/smart_core/lib/math/inc/
 # EXTRAINCDIRS += $(WRAPPER)/smart_core/lib/inc/
 # EXTRAINCDIRS += $(WRAPPER)/hardware/inc/
 # EXTRAINCDIRS += tasks/inc/
 # EXTRAINCDIRS += datas/inc/
-# EXTRAINCDIRS += $(WRAPPER)/system/inc/
 
 CFLAGS += -Os 
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
@@ -250,12 +253,12 @@ size: $(RESULT).elf
 	$(SIZE) $(RESULT).elf
 
 clean:
-	rm -f $(RESULT).elf
-	rm -f $(RESULT).bin
-	rm -f $(RESULT).map
-	rm -f $(RESULT).hex
-	rm -f $(RESULT).lst
-	rm -f obj/*.o
+	del -f $(RESULT).elf
+	del -f $(RESULT).bin
+	del -f $(RESULT).map
+	del -f $(RESULT).hex
+	del -f $(RESULT).lst
+	del -f obj\*.o
 erase:
 	st-flash erase
 

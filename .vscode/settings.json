@@ -1,6 +1,13 @@
 {
     "files.associations": {
         "hal_timer.h": "c",
-        "hal_led.h": "c"
+        "hal_led.h": "c",
+        "smart_system.h": "c",
+        "smart_irq.h": "c",
+        "stm32f10x.h": "c",
+        "misc.h": "c",
+        "board_init.h": "c",
+        "initcall.h": "c",
+        "smart_initcall.h": "c"
     }
 }
