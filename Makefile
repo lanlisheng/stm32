@@ -119,6 +119,7 @@ SRC += $(STD_DRIVER)/src/stm32f10x_rcc.c
 SRC += $(wildcard $(USER)/*.c)
 SRC += $(wildcard $(HAL_DRIVER)/*.c)
 SRC += $(wildcard ./*.c)
+
 #SRC += $(wildcard $(WRAPPER)/system/*.c)
 # SRC += $(wildcard $(WRAPPER)/smart_core/common/*.c)
 # SRC += $(wildcard $(WRAPPER)/smart_core/driver/common/*.c)
@@ -253,12 +254,12 @@ size: $(RESULT).elf
 	$(SIZE) $(RESULT).elf
 
 clean:
-	del -f $(RESULT).elf
-	del -f $(RESULT).bin
-	del -f $(RESULT).map
-	del -f $(RESULT).hex
-	del -f $(RESULT).lst
-	del -f obj\*.o
+	del  $(RESULT).elf
+	del  $(RESULT).bin
+	del  $(RESULT).map
+	del  $(RESULT).hex
+	del  $(RESULT).lst
+	del   obj\*.o
 erase:
 	st-flash erase
 
