@@ -12,11 +12,11 @@ static void hal_CoreClockInit(void) {
 }
 
 void SysTick_Handler(void) {
-  static unsigned char i = 0;
-  i++;
-  if (i > 10) {
-    i = 0;
-    hal_LedTurn();
-  }
+  //  static unsigned char i = 0;
+  //  i++;
+  //  if (i > 10) {
+  //    i = 0;
+  //    hal_LedTurn();
+  //  }
   // 定时中断处理
 }
