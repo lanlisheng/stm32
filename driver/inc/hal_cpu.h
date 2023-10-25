@@ -1,5 +1,5 @@
-#ifndef _HAL_CPU_H
-#define _HAL_CPU_H
+#ifndef HAL_CPU_H
+#define HAL_CPU_H
 
 void hal_CpuInit(void);
 

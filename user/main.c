@@ -1,16 +1,18 @@
-// #include "stm32f4xx.h"
 #include "hal_cpu.h"
 #include "hal_led.h"
 #include "hal_timer.h"
+#include "os/os_system.h"
 #include "smart.h"
 #include "stm32f10x.h"
 
 int main(void) {
-  hal_ledConfig();
   hal_CpuInit();
-  hal_timer4Config();
-  while (1) {
-  }
+  OS_TaskInit();
+  hal_TimerInit();
+
+  hal_LedInit();
+  OS_CreatTask(OS_TASK1, hal_LedProc, 1, OS_RUN);
+  OS_Start();
   return 0;
 }
 

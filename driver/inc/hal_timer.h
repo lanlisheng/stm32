@@ -1,6 +1,6 @@
-#ifndef _HAL_TIME_H
-#define _HAL_TIME_H
+#ifndef HAL_TIME_H
+#define HAL_TIME_H
 
-void hal_timer4Config(void);
+void hal_TimerInit(void);
 
 #endif

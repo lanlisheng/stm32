@@ -9,6 +9,7 @@
 
 void hal_Led1Drive(unsigned char sta);
 void hal_BuzDrive(unsigned char sta);
-void hal_ledConfig(void);
 void hal_LedTurn(void);
+void hal_LedInit(void);
+void hal_LedProc(void);
 #endif

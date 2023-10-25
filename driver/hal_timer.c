@@ -2,7 +2,11 @@
 #include "hal_led.h"
 #include "stm32f10x.h"
 
-void hal_timer4Config(void) {
+static void hal_timer4Config(void);
+
+void hal_TimerInit(void) { hal_timer4Config(); }
+
+static void hal_timer4Config(void) {
   TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
   NVIC_InitTypeDef NVIC_InitStructure;
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
@@ -30,13 +34,4 @@ void hal_timer4Config(void) {
   NVIC_Init(&NVIC_InitStructure);
 }
 
-void TIM4_IRQHandler(void) {
-  TIM_ClearFlag(TIM4, TIM_FLAG_Update);
-  static unsigned short i = 0;
-  i++;
-  if (i > 10000) // 50us*10000 = 500ms
-  {
-    i = 0;
-    hal_LedTurn();
-  }
-}
+void TIM4_IRQHandler(void) { TIM_ClearFlag(TIM4, TIM_FLAG_Update); }
