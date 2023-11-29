@@ -39,8 +39,8 @@ void hal_LedInit(void) {
     LedTimer[i] = *(pLed[i] + 1);
     QueueEmpty(LedCmdBuff[i]);
   }
-  LedMsgInput(BUZ, LED_LIGHT_100MS, 1);
-  LedMsgInput(LED1, LED_LIGHT, 1);
+  //  LedMsgInput(BUZ, LED_LIGHT_100MS, 1);
+  //  LedMsgInput(LED1, LED_LIGHT, 1);
 }
 
 static void hal_ledConfig(void) {

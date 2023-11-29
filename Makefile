@@ -39,6 +39,7 @@ endif
 ifeq ($(MCU), cortex-m3)
 STARTUP = $(WRAPPER)/startup/stm32f10x
 USER = $(WRAPPER)/user
+APP = $(WRAPPER)/app
 OS = $(WRAPPER)/os
 HAL_DRIVER = $(WRAPPER)/driver
 STD_DRIVER = $(WRAPPER)/Libraries_stm32f10x/STM32F10x_StdPeriph_Driver
@@ -118,6 +119,7 @@ SRC += $(STD_DRIVER)/src/stm32f10x_rcc.c
 
 SRC += $(wildcard $(USER)/*.c)
 SRC += $(wildcard $(OS)/*.c)
+SRC += $(wildcard $(APP)/*.c)
 SRC += $(wildcard $(HAL_DRIVER)/*.c)
 SRC += $(wildcard ./*.c)
 
@@ -144,6 +146,7 @@ EXTRAINCDIRS += $(STARTUP)/inc/
 EXTRAINCDIRS += $(STD_DRIVER)/inc/
 EXTRAINCDIRS += $(USER)/
 EXTRAINCDIRS += $(OS)/
+EXTRAINCDIRS += $(APP)/
 EXTRAINCDIRS += $(WRAPPER)/driver/inc/
 EXTRAINCDIRS += $(WRAPPER)/user/
 

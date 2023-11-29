@@ -124,6 +124,8 @@ typedef void (*CPUInterrupt_CallBack_t)(CPU_EA_TYPEDEF cmd, uint8_t *pSta);
 
 typedef enum {
   OS_TASK1,
+  OS_TASK2,
+  OS_TASK3,
   OS_TASK_SUM,
 } OS_TaskIDTypeDef;
 
