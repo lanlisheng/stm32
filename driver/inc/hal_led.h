@@ -1,6 +1,8 @@
 #ifndef HAL_LED_H
 #define HAL_LED_H
 
+#include <stdint.h>
+
 #define LED1_PORT GPIOA
 #define LED1_PIN GPIO_Pin_1
 
@@ -26,9 +28,7 @@ typedef enum {
   LED_BLINK4,
 } LED_EFFECT_TYPEDEF;
 
-void hal_Led1Drive(unsigned char sta);
-void hal_BuzDrive(unsigned char sta);
-void hal_LedTurn(void);
 void hal_LedInit(void);
 void hal_LedProc(void);
+void LedMsgInput(uint8_t type, LED_EFFECT_TYPEDEF cmd, uint8_t clr);
 #endif
