@@ -1,9 +1,15 @@
 #include "hal_led.h"
+#include "hal_timer.h"
+#include "os_system.h"
 #include "stm32f10x.h"
 
 static void hal_ledConfig(void);
+static void LedBlink_Handle(void);
 
-void hal_LedInit(void) { hal_ledConfig(); }
+void hal_LedInit(void) {
+  hal_ledConfig();
+  hal_CreatTimer(T_LED, LedBlink_Handle, 5000, T_STA_START);
+}
 
 static void hal_ledConfig(void) {
   GPIO_InitTypeDef GPIO_InitStructure;
@@ -28,7 +34,7 @@ void hal_LedProc(void) {
   i++;
   if (i > 5) {
     i = 0;
-    hal_LedTurn();
+    //    hal_LedTurn();
   }
 }
 
@@ -51,4 +57,9 @@ void hal_BuzDrive(unsigned char sta) {
 void hal_LedTurn(void) {
   GPIO_WriteBit(GPIOA, GPIO_Pin_1,
                 (BitAction)(1 - GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_1)));
+}
+
+static void LedBlink_Handle(void) {
+  hal_LedTurn();
+  hal_ResetTimer(T_LED, T_STA_START);
 }

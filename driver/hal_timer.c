@@ -3,8 +3,19 @@
 #include "stm32f10x.h"
 
 static void hal_timer4Config(void);
+static void hal_TimerHandle(void);
 
-void hal_TimerInit(void) { hal_timer4Config(); }
+volatile Stu_TimerTypeDef Stu_Timer[T_SUM];
+
+void hal_TimerInit(void) {
+  hal_timer4Config();
+  for (int i = 0; i < T_SUM; ++i) {
+    Stu_Timer[i].state = T_STA_STOP;
+    Stu_Timer[i].CurrentCount = 0;
+    Stu_Timer[i].Period = 0;
+    Stu_Timer[i].func = 0;
+  }
+}
 
 static void hal_timer4Config(void) {
   TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
@@ -34,4 +45,39 @@ static void hal_timer4Config(void) {
   NVIC_Init(&NVIC_InitStructure);
 }
 
-void TIM4_IRQHandler(void) { TIM_ClearFlag(TIM4, TIM_FLAG_Update); }
+void hal_CreatTimer(TIMER_ID_TYPEDEF id, void (*proc)(void), uint16_t Period,
+                    TIMER_STATE_TYPEDEF state) {
+  Stu_Timer[id].state = state;
+  Stu_Timer[id].CurrentCount = 0;
+  Stu_Timer[id].Period = Period;
+  Stu_Timer[id].func = proc;
+}
+
+TIMER_RESULT_TYPEDEF hal_ResetTimer(TIMER_ID_TYPEDEF id,
+                                    TIMER_STATE_TYPEDEF state) {
+  if (Stu_Timer[id].func) {
+    Stu_Timer[id].state = state;
+    Stu_Timer[id].CurrentCount = 0;
+    return T_SUCCESS;
+  } else {
+    return T_FAIL;
+  }
+}
+
+static void hal_TimerHandle(void) {
+  for (int i = 0; i < T_SUM; ++i) {
+    if ((Stu_Timer[i].func) && (Stu_Timer[i].state == T_STA_START)) {
+      Stu_Timer[i].CurrentCount++;
+      if (Stu_Timer[i].CurrentCount >= Stu_Timer[i].Period) {
+        Stu_Timer[i].CurrentCount = 0;
+        Stu_Timer[i].state = T_STA_STOP;
+        Stu_Timer[i].func();
+      }
+    }
+  }
+}
+
+void TIM4_IRQHandler(void) {
+  TIM_ClearFlag(TIM4, TIM_FLAG_Update);
+  hal_TimerHandle();
+}
