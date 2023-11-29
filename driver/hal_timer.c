@@ -53,6 +53,40 @@ void hal_CreatTimer(TIMER_ID_TYPEDEF id, void (*proc)(void), uint16_t Period,
   Stu_Timer[id].func = proc;
 }
 
+TIMER_RESULT_TYPEDEF hal_CtrlTimerAction(TIMER_ID_TYPEDEF id,
+                                         TIMER_STATE_TYPEDEF sta) {
+  if (Stu_Timer[id].func) // 判断定时器是否存在
+  {
+    Stu_Timer[id].state = sta;
+    return T_SUCCESS;
+  } else {
+    return T_FAIL;
+  }
+}
+
+TIMER_STATE_TYPEDEF hal_GetTimerState(TIMER_ID_TYPEDEF id) {
+  if (Stu_Timer[id].func) // 判断定时器是否存在
+  {
+    return Stu_Timer[id].state;
+
+  } else {
+    return T_STA_INVAILD;
+  }
+}
+
+TIMER_RESULT_TYPEDEF hal_DeleteTimer(TIMER_ID_TYPEDEF id) {
+  if (Stu_Timer[id].func) {
+    Stu_Timer[id].state = T_STA_STOP;
+
+    Stu_Timer[id].CurrentCount = 0;
+    // Stu_Timer[id].Period = 0;
+    Stu_Timer[id].func = 0;
+    return T_SUCCESS;
+  } else {
+    return T_FAIL;
+  }
+}
+
 TIMER_RESULT_TYPEDEF hal_ResetTimer(TIMER_ID_TYPEDEF id,
                                     TIMER_STATE_TYPEDEF state) {
   if (Stu_Timer[id].func) {
