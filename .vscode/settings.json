@@ -8,6 +8,8 @@
         "misc.h": "c",
         "board_init.h": "c",
         "initcall.h": "c",
-        "smart_initcall.h": "c"
+        "smart_initcall.h": "c",
+        "os_system.h": "c",
+        "hal_oled.h": "c"
     }
 }

@@ -103,7 +103,7 @@ static void hal_TimerHandle(void) {
     if ((Stu_Timer[i].func) && (Stu_Timer[i].state == T_STA_START)) {
       Stu_Timer[i].CurrentCount++;
       if (Stu_Timer[i].CurrentCount >= Stu_Timer[i].Period) {
-        Stu_Timer[i].CurrentCount = 0;
+        Stu_Timer[i].CurrentCount = Stu_Timer[i].CurrentCount;
         Stu_Timer[i].state = T_STA_STOP;
         Stu_Timer[i].func();
       }

@@ -10,12 +10,13 @@ void hal_Oled_Refresh(void);
 void hal_Oled_Clear(void);
 // static void hal_Oled_DrawPoint(unsigned char x, unsigned char y,
 //                                unsigned char t);
+void hal_Oled_Delay(unsigned short t);
 void hal_Oled_DrawLine(unsigned char x1, unsigned char y1, unsigned char x2,
                        unsigned char y2, unsigned char mode);
 void hal_Oled_DrawCircle(unsigned char x, unsigned char y, unsigned char r);
 void hal_Oled_ShowChar(unsigned char x, unsigned char y, unsigned char chr,
                        unsigned char size1, unsigned char mode);
-void hal_Oled_ShowString(unsigned char x, unsigned char y, unsigned char *chr,
+void hal_Oled_ShowString(unsigned char x, unsigned char y, char *chr,
                          unsigned char size1, unsigned char mode);
 void hal_Oled_ShowNum(unsigned char x, unsigned char y, unsigned int num,
                       unsigned char len, unsigned char size1,
@@ -29,6 +30,9 @@ void hal_Oled_ShowPicture(unsigned char x, unsigned char y, unsigned char sizex,
                           unsigned char mode);
 void hal_Oled_ClearArea(unsigned char x, unsigned char y, unsigned char sizex,
                         unsigned char sizey);
+void SMART_Oled_Show_String_Fomarted(unsigned char x, unsigned char y,
+                                     unsigned char size, const char *format,
+                                     ...);
 extern unsigned char BMP1[];
 extern unsigned char BMP_IconWifiSignal[4][32];
 #endif

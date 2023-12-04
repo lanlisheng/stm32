@@ -1,5 +1,7 @@
 #include "hal_oled.h"
+#include "printf.h"
 #include "stm32F10x.h"
+#include <string.h>
 
 #define OLED_CMD 0  // 写命令
 #define OLED_DATA 1 // 写数据
@@ -895,7 +897,7 @@ const unsigned char asc2_2412[][36] = {
 
 };
 
-static void hal_Oled_Delay(unsigned short t);
+void hal_Oled_Delay(unsigned short t);
 static void hal_OledConfig(void);
 static void hal_Oled_DrawPoint(unsigned char x, unsigned char y,
                                unsigned char t);
@@ -980,7 +982,7 @@ void hal_Oled_Clear(void) {
   unsigned char i, n;
   for (i = 0; i < 8; i++) {
     for (n = 0; n < 128; n++) {
-      OLED_GRAM[n][i] = 0; // 清除所有数据
+      OLED_GRAM[n][i] = 0x0; // 清除所有数据
     }
   }
   hal_Oled_Refresh(); // 更新显示
@@ -1137,7 +1139,7 @@ void hal_Oled_ShowChar(unsigned char x, unsigned char y, unsigned char chr,
 // size1:字体大小
 //*chr:字符串起始地址
 // mode:0,反色显示;1,正常显示
-void hal_Oled_ShowString(unsigned char x, unsigned char y, unsigned char *chr,
+void hal_Oled_ShowString(unsigned char x, unsigned char y, char *chr,
                          unsigned char size1, unsigned char mode) {
   while ((*chr >= ' ') && (*chr <= '~')) // 判断是不是非法字符!
   {
@@ -1249,6 +1251,47 @@ void hal_Oled_ClearArea(unsigned char x, unsigned char y, unsigned char sizex,
   }
 }
 
+void SMART_Oled_Show_String(uint8_t x, uint8_t y, uint8_t size,
+                            const uint8_t *str) {
+  uint8_t height = 16;
+  uint8_t width = 8;
+
+  if (size != 16) {
+    size = 12;
+    height = 12;
+    width = 6;
+  }
+
+  uint8_t MAX_CHAR_POSX = 128 - width;
+  uint8_t MAX_CHAR_POSY = 64 - height;
+
+  while (*str != '\0') {
+    if (x > MAX_CHAR_POSX) {
+      x = 0;
+      y += size;
+    }
+    if (y > MAX_CHAR_POSY) {
+      y = x = 0;
+      hal_Oled_Clear();
+    }
+    hal_Oled_ShowChar(x, y, *str, size, 1);
+    x += width;
+    str++;
+  }
+}
+
+void SMART_Oled_Show_String_Fomarted(uint8_t x, uint8_t y, uint8_t size,
+                                     const char *format, ...) {
+  uint8_t buffer[128];
+  memset(buffer, 0, 128);
+  va_list args;
+
+  va_start(args, format);
+  avsprintf((char *)buffer, format, args);
+  va_end(args);
+  SMART_Oled_Show_String(x, y, size, buffer);
+}
+
 static void hal_OledConfig(void) {
 
   SPI_InitTypeDef SPI_InitStructure;
@@ -1297,7 +1340,7 @@ static void hal_OledConfig(void) {
   SPI_Cmd(SPI1, ENABLE); // 使能SPI2外设
 }
 
-static void hal_Oled_Delay(unsigned short t) {
+void hal_Oled_Delay(unsigned short t) {
   unsigned short i, j, k;
   j = t;
   for (i = 0; i < j; i++)
@@ -1350,8 +1393,8 @@ void hal_OledInit(void) {
   hal_Oled_WR_Byte(0x14, OLED_CMD); //--set(0x10) disable
   hal_Oled_WR_Byte(0xA4, OLED_CMD); // Disable Entire Display On (0xa4/0xa5)
   hal_Oled_WR_Byte(0xA6, OLED_CMD); // Disable Inverse Display On (0xa6/a7)
-  hal_Oled_Clear();
   hal_Oled_WR_Byte(0xAF, OLED_CMD);
+  hal_Oled_Clear();
 
   //	hal_Oled_ShowString(8,0,"Wu Ji Mcu",16,1);
   //	hal_Oled_Refresh();
