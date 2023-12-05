@@ -146,17 +146,17 @@ static uint8_t hal_getKey1Sta(void) {
   return (!GPIO_ReadInputDataBit(K1_PORT, K1_PIN));
 }
 static uint8_t hal_getKey2Sta(void) {
-  return (!GPIO_ReadInputDataBit(K1_PORT, K1_PIN));
+  return (!GPIO_ReadInputDataBit(K2_PORT, K2_PIN));
 }
 static uint8_t hal_getKey3Sta(void) {
-  return (!GPIO_ReadInputDataBit(K1_PORT, K1_PIN));
+  return (!GPIO_ReadInputDataBit(K3_PORT, K3_PIN));
 }
 static uint8_t hal_getKey4Sta(void) {
-  return (!GPIO_ReadInputDataBit(K1_PORT, K1_PIN));
+  return (!GPIO_ReadInputDataBit(K4_PORT, K4_PIN));
 }
 static uint8_t hal_getKey5Sta(void) {
-  return (!GPIO_ReadInputDataBit(K1_PORT, K1_PIN));
+  return (!GPIO_ReadInputDataBit(K5_PORT, K5_PIN));
 }
 static uint8_t hal_getKey6Sta(void) {
-  return (!GPIO_ReadInputDataBit(K1_PORT, K1_PIN));
+  return (!GPIO_ReadInputDataBit(K6_PORT, K6_PIN));
 }

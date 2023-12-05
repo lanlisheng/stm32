@@ -10,6 +10,8 @@ void hal_Oled_Refresh(void);
 void hal_Oled_Clear(void);
 // static void hal_Oled_DrawPoint(unsigned char x, unsigned char y,
 //                                unsigned char t);
+void OLED_Fill(unsigned char x1, unsigned char y1, unsigned char x2,
+               unsigned char y2, unsigned char dot);
 void hal_Oled_Delay(unsigned short t);
 void hal_Oled_DrawLine(unsigned char x1, unsigned char y1, unsigned char x2,
                        unsigned char y2, unsigned char mode);

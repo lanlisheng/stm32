@@ -21,10 +21,7 @@ OPENOCD_FLAGS =
 # Basename for the resulting .elf/.bin/.hex file
 RESULT ?= stm32f103
 
-#USBSERIAL = /dev/tty.wchusbserial14340
-#/dev/tty.SLAB_USBtoUART
 USBSERIAL = /dev/tty.usbserial-0001
-#/dev/tty.wchusbserial14330
 
 ifeq ($(MCU), cortex-m3)
 STARTUP = $(WRAPPER)/startup/stm32f10x
@@ -46,13 +43,13 @@ ifeq ($(MCU), cortex-m3)
 LINKER_SCRIPT = stm32f10x.ld
 SRC += $(STARTUP)/startup_stm32f10x_$(MODEL).s
 SRC += $(CMSIS)/CM3/CoreSupport/core_cm3.c
-# SRC += $(STARTUP)/system_stm32f10x.c
-# SRC += $(STARTUP)/stm32f10x_it.c
-# SRC += $(wildcard $(WRAPPER)/smart_core/driver/STM32F1xx/STM32_USB-FS-Device_Driver/src/*.c)
+SRC += $(STARTUP)/system_stm32f10x.c
+SRC += $(STARTUP)/stm32f10x_it.c
 endif
 
-SRC += $(wildcard $(STARTUP)/*.c)
+# SRC += $(wildcard $(STARTUP)/*.c)
 
+# SRC += $(wildcard $(STD_DRIVER)/src/*.c)
 SRC += $(STD_DRIVER)/src/misc.c
 SRC += $(STD_DRIVER)/src/stm32f10x_adc.c
 SRC += $(STD_DRIVER)/src/stm32f10x_dma.c
@@ -76,10 +73,10 @@ EXTRAINCDIRS += $(USER)/
 EXTRAINCDIRS += $(OS)/
 EXTRAINCDIRS += $(APP)/
 EXTRAINCDIRS += $(WRAPPER)/driver/inc/
-EXTRAINCDIRS += $(WRAPPER)/user/
+# EXTRAINCDIRS += $(WRAPPER)/user/
 
 ifeq ($(MCU), cortex-m3)
-EXTRAINCDIRS += $(CMSIS)/CM3/DeviceSupport/ST/STM32F10x
+# EXTRAINCDIRS += $(CMSIS)/CM3/DeviceSupport/ST/STM32F10x
 EXTRAINCDIRS += $(CMSIS)/CM3/CoreSupport/
 endif
 

@@ -25,46 +25,40 @@
 **  rights to distribute the assembled, compiled & linked contents of this
 **  file as part of an application binary file, provided that it is built
 **  using the System Workbench for MCU toolchain.
-**  Add by Richile
 **
 *****************************************************************************
 */
-
-/* Specify the memory areas 1Mbyte FLASH, 192KB RAM*/
-MEMORY
-{
-	FLASH (rx)      : ORIGIN = 0x8000000, LENGTH =64K  /* bootloader start from 128K, (sector5) */
-	RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 20K
-	CCMRAM (rw)      : ORIGIN = 0x10000000, LENGTH = 64K
-}
 
 /* Entry Point */
 ENTRY(Reset_Handler)
 
 /* Highest address of the user mode stack */
-/* _estack = 0x2001FFFF; */   /* end of RAM */
+_estack = ORIGIN(RAM) + LENGTH(RAM);    /* end of RAM */
+/* Generate a link error if heap and stack don't fit into RAM */
+_Min_Heap_Size = 0x200;      /* required amount of heap  */
+_Min_Stack_Size = 0x400; /* required amount of stack */
 
-
-
-_estack = ORIGIN(RAM) + LENGTH(RAM) - 1;
-
+/* Specify the memory areas 1Mbyte FLASH, 192KB RAM*/
+MEMORY
+{
+RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 20K
+FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 64K
+}
 /* Define output sections */
 SECTIONS
 {
   /* The startup code goes first into FLASH */
-  /* .isr_vector : */
-  /* { */
-  /*   . = ALIGN(4); */
-  /*   KEEP(*(.isr_vector)) */ /* Startup code */
-  /*   . = ALIGN(4); */
-  /* } >FLASH */
+  .isr_vector :
+  {
+    . = ALIGN(4);
+    KEEP(*(.isr_vector)) /* Startup code */
+    . = ALIGN(4);
+  } >FLASH
 
   /* The program code and other data goes into FLASH */
   .text :
   {
     . = ALIGN(4);
-	PROVIDE (smart_isr_vector_table_base = .);
-    KEEP(*(.isr_vector .isr_vector.*))
     *(.text)           /* .text sections (code) */
     *(.text*)          /* .text* sections (code) */
     *(.glue_7)         /* glue arm to thumb code */
@@ -75,46 +69,8 @@ SECTIONS
     KEEP (*(.fini))
 
     . = ALIGN(4);
-    _exit = .;
     _etext = .;        /* define a global symbols at end of code */
-    
   } >FLASH
-
-  	/* 
-	 * Data init section section
-	 */
-	.initcalldata.init :
-	{
-		. = ALIGN(4);
-		__data_initcall_start = .;
-		KEEP(*(.initcalldata.init))
-		. = ALIGN(4);
-		__data_initcall_end   = .;
-	} >FLASH
-  
-	/* 
-	 * Module init section section
-	 */
-	.initcallmodule.init :
-	{
-		. = ALIGN(4);
-		__module_initcall_start = .;
-		KEEP(*(.initcallmodule.init))
-		. = ALIGN(4);
-		__module_initcall_end   = .;
-	} >FLASH
-	
-	/* 
-	 * Task looper section section
-	 */
-	.loopermodule.looper :
-	{
-		. = ALIGN(4);
-		__module_looper_start = .;
-		KEEP(*(.loopermodule.looper))
-		. = ALIGN(4);
-		__module_looper_end   = .;
-	} >FLASH
 
   /* Constant data goes into FLASH */
   .rodata :
@@ -152,9 +108,6 @@ SECTIONS
     KEEP (*(.fini_array*))
     PROVIDE_HIDDEN (__fini_array_end = .);
   } >FLASH
-  
-  
-  
 
   /* used by the startup to initialize data */
   _sidata = LOADADDR(.data);
@@ -170,25 +123,6 @@ SECTIONS
     . = ALIGN(4);
     _edata = .;        /* define a global symbol at data end */
   } >RAM AT> FLASH
-
-  _siccmram = LOADADDR(.ccmram);
-
-  /* CCM-RAM section 
-  * 
-  * IMPORTANT NOTE! 
-  * If initialized variables will be placed in this section,
-  * the startup code needs to be modified to copy the init-values.  
-  */
-  .ccmram :
-  {
-    . = ALIGN(4);
-    _sccmram = .;       /* create a global symbol at ccmram start */
-    *(.ccmram)
-    *(.ccmram*)
-    
-    . = ALIGN(4);
-    _eccmram = .;       /* create a global symbol at ccmram end */
-  } >CCMRAM AT> FLASH
 
   
   /* Uninitialized data section */
@@ -207,26 +141,16 @@ SECTIONS
     __bss_end__ = _ebss;
   } >RAM
 
-  /*
-   * The heap consumes the remainder of the SRAM.
-   * for malloc()
-   * Add by Richile
-   */
-  .heap (NOLOAD) :
+  /* User_heap_stack section, used to check that there is enough RAM left */
+  ._user_heap_stack :
   {
-    . = ALIGN(4);
-    _sheap = . ;
-    /*
-     * This allows us to declare an object or objects up to the minimum acceptable
-     * heap size and receive a linker error if the space available for the heap is
-     * not sufficient.
-     */
-    *(.heap)
-    
-    /* extend the heap up to the top of SRAM */
-    . = ORIGIN(RAM) + LENGTH(RAM) - ABSOLUTE(_sheap);
-    _eheap = .;
-  } > RAM
+    . = ALIGN(8);
+    PROVIDE ( end = . );
+    PROVIDE ( _end = . );
+    . = . + _Min_Heap_Size;
+    . = . + _Min_Stack_Size;
+    . = ALIGN(8);
+  } >RAM
 
   
 

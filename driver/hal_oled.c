@@ -1,7 +1,8 @@
 #include "hal_oled.h"
 #include "printf.h"
-#include "stm32F10x.h"
 #include <string.h>
+
+#include "stm32f10x.h"
 
 #define OLED_CMD 0  // Ð´ÃüÁî
 #define OLED_DATA 1 // Ð´Êý¾Ý
@@ -1349,6 +1350,15 @@ void hal_Oled_Delay(unsigned short t) {
     for (k = 0; k < 1000; k++)
       ;
   }
+}
+
+void OLED_Fill(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint8_t dot) {
+  uint8_t x, y;
+  for (x = x1; x <= x2; x++) {
+    for (y = y1; y <= y2; y++)
+      hal_Oled_DrawPoint(x, y, dot);
+  }
+  hal_Oled_Refresh();
 }
 
 void hal_OledInit(void) {

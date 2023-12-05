@@ -5,13 +5,7 @@
 
 static void KeyEventHandle(KEY_VALUE_TYPEDEF keys);
 
-void AppInit(void) {
-  hal_KeyScanCBSRegister(KeyEventHandle);
-  hal_OledInit();
-  hal_Oled_Clear();
-  hal_Oled_Refresh();
-  LedMsgInput(LED1, 4, 1);
-}
+void AppInit(void) { hal_KeyScanCBSRegister(KeyEventHandle); }
 
 void AppProc(void) {}
 
