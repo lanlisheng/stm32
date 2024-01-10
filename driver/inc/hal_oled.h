@@ -35,6 +35,7 @@ void hal_Oled_ClearArea(unsigned char x, unsigned char y, unsigned char sizex,
 void SMART_Oled_Show_String_Fomarted(unsigned char x, unsigned char y,
                                      unsigned char size, const char *format,
                                      ...);
+void delay_ms(unsigned short time);
 extern unsigned char BMP1[];
 extern unsigned char BMP_IconWifiSignal[4][32];
 #endif

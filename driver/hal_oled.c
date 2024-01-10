@@ -1344,10 +1344,16 @@ static void hal_OledConfig(void) {
 void hal_Oled_Delay(unsigned short t) {
   unsigned short i, j, k;
   j = t;
-  for (i = 0; i < j; i++)
-    ;
-  {
+  for (i = 0; i < j; i++) {
     for (k = 0; k < 1000; k++)
+      ;
+  }
+}
+void delay_ms(unsigned short time) {
+  unsigned short i = 0;
+  while (time--) {
+    i = 12000;
+    while (i--)
       ;
   }
 }
@@ -1406,6 +1412,6 @@ void hal_OledInit(void) {
   hal_Oled_WR_Byte(0xAF, OLED_CMD);
   hal_Oled_Clear();
 
-  //	hal_Oled_ShowString(8,0,"Wu Ji Mcu",16,1);
-  //	hal_Oled_Refresh();
+  //  hal_Oled_ShowString(8, 0, (char *)"Wu Ji Mcu", 16, 1);
+  //  hal_Oled_Refresh();
 }

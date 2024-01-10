@@ -7,24 +7,22 @@
 #include "os_system.h"
 
 int main(void) {
-  //  hal_CPUInit();
-  //  OS_TaskInit();
-  //  hal_TimerInit();
+  hal_CPUInit();
+  OS_TaskInit();
+  hal_TimerInit();
 
   hal_OledInit();
-  OLED_Fill(0, 0, 127, 63, 1);
-  //  hal_Oled_ShowString(16, 20, "Smart alarm", 16, 1);
-  //  hal_Oled_ShowString(40, 40, "system", 16, 0);
-  //  hal_Oled_Refresh();
+  hal_Oled_ShowString(16, 20, "Smart alarm", 16, 1);
+  hal_Oled_ShowString(40, 40, "system", 16, 1);
+  hal_Oled_Refresh();
+  hal_LedInit();
+  OS_CreatTask(OS_TASK1, hal_LedProc, 1, OS_RUN);
 
-  //  hal_LedInit();
-  //  OS_CreatTask(OS_TASK1, hal_LedProc, 1, OS_RUN);
-  //
-  //  hal_KeyInit();
-  //  OS_CreatTask(OS_TASK2, hal_KeyProc, 1, OS_RUN);
-  //
-  //  AppInit();
-  //  OS_CreatTask(OS_TASK3, AppProc, 1, OS_RUN);
-  //
-  //  OS_Start();
+  hal_KeyInit();
+  OS_CreatTask(OS_TASK2, hal_KeyProc, 1, OS_RUN);
+
+  AppInit();
+  OS_CreatTask(OS_TASK3, AppProc, 1, OS_RUN);
+
+  OS_Start();
 }

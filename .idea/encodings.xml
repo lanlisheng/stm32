@@ -3,7 +3,7 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/app/app.c" charset="GB2312" />
     <file url="file://$PROJECT_DIR$/driver/hal_cpu.c" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/driver/hal_oled.c" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/driver/hal_oled.c" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/driver/inc/hal_oled.h" charset="GB2312" />
     <file url="file://$PROJECT_DIR$/user/main.c" charset="UTF-8" />
   </component>
