@@ -11,10 +11,6 @@ int main(void) {
   OS_TaskInit();
   hal_TimerInit();
 
-  hal_OledInit();
-  hal_Oled_ShowString(16, 20, "Smart alarm", 16, 1);
-  hal_Oled_ShowString(40, 40, "system", 16, 1);
-  hal_Oled_Refresh();
   hal_LedInit();
   OS_CreatTask(OS_TASK1, hal_LedProc, 1, OS_RUN);
 
