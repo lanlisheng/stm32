@@ -80,7 +80,7 @@ ifeq ($(MCU), cortex-m3)
 EXTRAINCDIRS += $(CMSIS)/CM3/CoreSupport/
 endif
 
-CFLAGS += -O1
+CFLAGS += -O0
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 
 CFLAGS += -mapcs-frame
