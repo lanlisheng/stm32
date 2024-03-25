@@ -34,18 +34,18 @@ void AppInit(void) {
   hal_KeyScanCBSRegister(KeyEventHandle);
   hal_RFCRcvCBSRegister(RfdRcvHandle);
 
-  stuSystemtime.year = 2021;
-  stuSystemtime.mon = 5;
-  stuSystemtime.day = 18;
-  stuSystemtime.hour = 21;
-  stuSystemtime.min = 20;
-  stuSystemtime.week = 2;
+  stuSystemtime.year = 2024;
+  stuSystemtime.mon = 3;
+  stuSystemtime.day = 25;
+  stuSystemtime.hour = 22;
+  stuSystemtime.min = 50;
+  stuSystemtime.week = 1;
 }
 
 void AppProc(void) { pModeMenu->action(); }
 
 void showSystemTime(void) {
-  // 2024-03-5 22:50 Mon
+  // 2024-03-25 22:50 Mon
   hal_Oled_ShowChar(4, 54, (stuSystemtime.year / 1000) + '0', 8, 1);
   hal_Oled_ShowChar(10, 54, ((stuSystemtime.year % 1000) / 100) + '0', 8, 1);
   hal_Oled_ShowChar(16, 54, ((stuSystemtime.year % 1000 % 100) / 10) + '0', 8,
