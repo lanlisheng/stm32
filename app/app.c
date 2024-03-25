@@ -1,83 +1,125 @@
 #include "app.h"
 #include "OS_System.h"
+#include "hal_beep.h"
+#include "hal_eeprom.h"
 #include "hal_key.h"
 #include "hal_led.h"
 #include "hal_oled.h"
 #include "hal_rfd.h"
+#include "stdint.h"
 
 static void KeyEventHandle(KEY_VALUE_TYPEDEF keys);
 static void RfdRcvHandle(uint8_t *pBuff);
+static void menuInit(void);
+static void gnlMenu_DesktopCBS(void);
 
 Queue8 RFDRcvMsg; // RFD接收队列
 
+stu_mode_menu *pModeMenu;      // 系统当前菜单
+stu_system_time stuSystemtime; // 系统时间
+
+// 初始化桌面菜单
+stu_mode_menu generalModeMenu[GNL_MENU_SUM] = {
+    {GNL_MENU_DESKTOP, DESKTOP_MENU_POS, "Desktop", gnlMenu_DesktopCBS,
+     SCREEN_CMD_RESET, 0, 0xFF, 0, 0, 0, 0},
+};
+
 void AppInit(void) {
+  hal_OledInit();
+  hal_BeepInit();
+  hal_eepromInit();
+  // ParaInit();
+  menuInit();
   QueueEmpty(RFDRcvMsg);
   hal_KeyScanCBSRegister(KeyEventHandle);
-  hal_OledInit();
   hal_RFCRcvCBSRegister(RfdRcvHandle);
-  hal_Oled_ShowString(40, 2, "Recode", 16, 1);
-  // hal_Oled_ShowString(16, 20, "Smart alarm", 16, 0);
-  // hal_Oled_ShowString(40, 40, "system", 16, 1);
+
+  stuSystemtime.year = 2021;
+  stuSystemtime.mon = 5;
+  stuSystemtime.day = 18;
+  stuSystemtime.hour = 21;
+  stuSystemtime.min = 20;
+  stuSystemtime.week = 2;
+}
+
+void AppProc(void) { pModeMenu->action(); }
+
+void showSystemTime(void) {
+  // 2024-03-5 22:50 Mon
+  hal_Oled_ShowChar(4, 54, (stuSystemtime.year / 1000) + '0', 8, 1);
+  hal_Oled_ShowChar(10, 54, ((stuSystemtime.year % 1000) / 100) + '0', 8, 1);
+  hal_Oled_ShowChar(16, 54, ((stuSystemtime.year % 1000 % 100) / 10) + '0', 8,
+                    1);
+  hal_Oled_ShowChar(22, 54, (stuSystemtime.year % 1000 % 100 % 10) + '0', 8, 1);
+
+  hal_Oled_ShowString(28, 54, "-", 8, 1);
+
+  hal_Oled_ShowChar(34, 54, (stuSystemtime.mon / 10) + '0', 8, 1);
+  hal_Oled_ShowChar(40, 54, (stuSystemtime.mon % 10) + '0', 8, 1);
+
+  hal_Oled_ShowString(46, 54, "-", 8, 1);
+
+  hal_Oled_ShowChar(52, 54, (stuSystemtime.day / 10) + '0', 8, 1);
+  hal_Oled_ShowChar(58, 54, (stuSystemtime.day % 10) + '0', 8, 1);
+
+  hal_Oled_ShowChar(70, 54, (stuSystemtime.hour / 10) + '0', 8, 1);
+  hal_Oled_ShowChar(76, 54, (stuSystemtime.hour % 10) + '0', 8, 1);
+
+  hal_Oled_ShowString(82, 54, ":", 8, 1);
+
+  hal_Oled_ShowChar(88, 54, (stuSystemtime.min / 10) + '0', 8, 1);
+  hal_Oled_ShowChar(94, 54, (stuSystemtime.min % 10) + '0', 8, 1);
+
+  hal_Oled_ShowString(100, 54, " ", 8, 1);
+
+  switch (stuSystemtime.week) {
+  case 1:
+    hal_Oled_ShowString(106, 54, "Mon", 8, 1);
+    break;
+  case 2:
+    hal_Oled_ShowString(106, 54, "Tue", 8, 1);
+    break;
+  case 3:
+    hal_Oled_ShowString(106, 54, "Wed", 8, 1);
+    break;
+  case 4:
+    hal_Oled_ShowString(106, 54, "Thu", 8, 1);
+    break;
+  case 5:
+    hal_Oled_ShowString(106, 54, "Fir", 8, 1);
+    break;
+  case 6:
+    hal_Oled_ShowString(106, 54, "Sat", 8, 1);
+    break;
+  case 7:
+    hal_Oled_ShowString(106, 54, "Sun", 8, 1);
+    break;
+  default:
+    break;
+  }
   hal_Oled_Refresh();
 }
 
-void AppProc(void) {
-  unsigned char tBuff[3], dat;
-  if (QueueDataLen(RFDRcvMsg)) {
-    QueueDataOut(RFDRcvMsg, &dat);
-    if (dat == '#') {
-      QueueDataOut(RFDRcvMsg, &tBuff[2]); // 地址码
-      QueueDataOut(RFDRcvMsg, &tBuff[1]); // 地址码
-      QueueDataOut(RFDRcvMsg, &tBuff[0]); // 数据码
+static void menuInit(void) {
+  pModeMenu =
+      &generalModeMenu[GNL_MENU_DESKTOP]; // 设置上电显示的菜单界面为桌面显示
+  pModeMenu->refreshScreenCmd =
+      SCREEN_CMD_RESET; // 更新刷新界面标志，进入界面后刷新全界面UI
+}
 
-      dat = (tBuff[2] >> 4) & 0x0F;
-      if (dat > 9) {
-        hal_Oled_ShowChar(20, 40, (dat - 10) + 'A', 16, 1);
-      } else {
-        hal_Oled_ShowChar(20, 40, dat + '0', 16, 1);
-      }
+static void gnlMenu_DesktopCBS(void) {
+  if (pModeMenu->refreshScreenCmd == SCREEN_CMD_RESET) {
+    pModeMenu->refreshScreenCmd = SCREEN_CMD_NULL;
+    pModeMenu->keyVal = 0xff;
+    hal_Oled_Clear();
+    hal_Oled_ShowString(0, 0, "N", 8, 1);
 
-      dat = tBuff[2] & 0x0F;
-      if (dat > 9) {
-        hal_Oled_ShowChar(28, 40, (dat - 10) + 'A', 16, 1);
-      } else {
-        hal_Oled_ShowChar(28, 40, dat + '0', 16, 1);
-      }
+    hal_Oled_ShowString(16, 20, "Away arm", 24, 1);
+    showSystemTime();
 
-      hal_Oled_ShowChar(36, 40, ' ', 16, 1);
+    QueueEmpty(RFDRcvMsg);
 
-      dat = (tBuff[1] >> 4) & 0x0F;
-      if (dat > 9) {
-        hal_Oled_ShowChar(44, 40, (dat - 10) + 'A', 16, 1);
-      } else {
-        hal_Oled_ShowChar(44, 40, dat + '0', 16, 1);
-      }
-
-      dat = tBuff[1] & 0x0F;
-      if (dat > 9) {
-        hal_Oled_ShowChar(52, 40, (dat - 10) + 'A', 16, 1);
-      } else {
-        hal_Oled_ShowChar(52, 40, dat + '0', 16, 1);
-      }
-
-      hal_Oled_ShowChar(60, 40, ' ', 16, 1);
-
-      dat = (tBuff[0] >> 4) & 0x0F;
-      if (dat > 9) {
-        hal_Oled_ShowChar(68, 40, (dat - 10) + 'A', 16, 1);
-      } else {
-        hal_Oled_ShowChar(68, 40, dat + '0', 16, 1);
-      }
-
-      dat = tBuff[0] & 0x0F;
-      if (dat > 9) {
-        hal_Oled_ShowChar(76, 40, (dat - 10) + 'A', 16, 1);
-      } else {
-        hal_Oled_ShowChar(76, 40, dat + '0', 16, 1);
-      }
-
-      hal_Oled_Refresh();
-    }
+    hal_Oled_Refresh();
   }
 }
 
