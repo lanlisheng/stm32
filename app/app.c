@@ -12,6 +12,12 @@ static void KeyEventHandle(KEY_VALUE_TYPEDEF keys);
 static void RfdRcvHandle(uint8_t *pBuff);
 static void menuInit(void);
 static void gnlMenu_DesktopCBS(void);
+static void stgMenu_MainMenuCBS(void);
+static void stgMenu_FactorySettingsCBS(void);
+static void stgMenu_MachineInfoCBS(void);
+static void stgMenu_WifiCBS(void);
+static void stgMenu_DTCListCBS(void);
+static void stgMenu_LearnSensorCBS(void);
 
 Queue8 RFDRcvMsg; // RFD接收队列
 
@@ -22,6 +28,22 @@ stu_system_time stuSystemtime; // 系统时间
 stu_mode_menu generalModeMenu[GNL_MENU_SUM] = {
     {GNL_MENU_DESKTOP, DESKTOP_MENU_POS, "Desktop", gnlMenu_DesktopCBS,
      SCREEN_CMD_RESET, 0, 0xFF, 0, 0, 0, 0},
+};
+
+// 初始化设置菜单
+stu_mode_menu settingModeMenu[STG_MENU_SUM] = {
+    {STG_MENU_MAIN_SETTING, STG_MENU_POS, "Main Menu", stgMenu_MainMenuCBS,
+     SCREEN_CMD_RESET, 0, 0xFF, 0, 0, 0, 0},
+    {STG_MENU_LEARNING_SENSOR, STG_SUB_2_MENU_POS, "1. Learning Dtc",
+     stgMenu_LearnSensorCBS, SCREEN_CMD_RESET, 0, 0xFF, 0, 0, 0, 0},
+    {STG_MENU_DTC_LIST, STG_SUB_2_MENU_POS, "2. Dtc List", stgMenu_DTCListCBS,
+     SCREEN_CMD_RESET, 0, 0xFF, 0, 0, 0, 0},
+    {STG_MENU_WIFI, STG_WIFI_MENU_POS, "3. WiFi", stgMenu_WifiCBS,
+     SCREEN_CMD_RESET, 0, 0xFF, 0, 0, 0, 0},
+    {STG_MENU_MACHINE_INFO, STG_SUB_2_MENU_POS, "4. Mac Info",
+     stgMenu_MachineInfoCBS, SCREEN_CMD_RESET, 0, 0xFF, 0, 0, 0, 0},
+    {STG_MENU_FACTORY_SETTINGS, STG_SUB_2_MENU_POS, "5. Default Setting",
+     stgMenu_FactorySettingsCBS, SCREEN_CMD_RESET, 0, 0xFF, 0, 0, 0, 0},
 };
 
 void AppInit(void) {
@@ -101,13 +123,12 @@ void showSystemTime(void) {
 }
 
 static void menuInit(void) {
-  pModeMenu =
-      &generalModeMenu[GNL_MENU_DESKTOP]; // 设置上电显示的菜单界面为桌面显示
-  pModeMenu->refreshScreenCmd =
-      SCREEN_CMD_RESET; // 更新刷新界面标志，进入界面后刷新全界面UI
+  pModeMenu = &generalModeMenu[GNL_MENU_DESKTOP];
+  pModeMenu->refreshScreenCmd = SCREEN_CMD_RESET;
 }
 
 static void gnlMenu_DesktopCBS(void) {
+  uint8_t keys;
   if (pModeMenu->refreshScreenCmd == SCREEN_CMD_RESET) {
     pModeMenu->refreshScreenCmd = SCREEN_CMD_NULL;
     pModeMenu->keyVal = 0xff;
@@ -121,7 +142,101 @@ static void gnlMenu_DesktopCBS(void) {
 
     hal_Oled_Refresh();
   }
+  if (pModeMenu->keyVal != 0xFF) {
+    keys = pModeMenu->keyVal;
+    pModeMenu->keyVal = 0xFF;
+    switch (keys) {
+    case KEY6_LONG_PRESS:
+      pModeMenu = &settingModeMenu[STG_MENU_MAIN_SETTING];
+      pModeMenu->refreshScreenCmd = SCREEN_CMD_RESET;
+      break;
+    }
+  }
 }
+
+static void stgMenu_MainMenuCBS(void) {
+  uint8_t keys;
+  uint8_t ClrScreenFlag;
+  static stu_mode_menu *pMenu; // save current menu
+  static stu_mode_menu *bpMenu;
+  static stu_mode_menu *MHead;
+  static stu_mode_menu *MTail;
+
+  static uint8_t stgMainMenuSelectedPos = 0;
+  if (pModeMenu->refreshScreenCmd == SCREEN_CMD_RESET) {
+    pModeMenu->refreshScreenCmd = SCREEN_CMD_NULL;
+    pMenu = &settingModeMenu[0];
+    hal_Oled_Clear();
+
+    hal_Oled_ShowString(37, 0, pMenu->pModeType, 12, 1);
+    hal_Oled_Refresh();
+
+    pMenu = &settingModeMenu[1];
+    MHead = pMenu;
+    MTail = pMenu + 3;
+    bpMenu = 0;
+
+    ClrScreenFlag = 1;
+    stgMainMenuSelectedPos = 1;
+    keys = 0xFF;
+  }
+  if (pModeMenu->keyVal != 0xFF) {
+    keys = pModeMenu->keyVal;
+    pModeMenu->keyVal = 0xFF;
+    switch (keys) {
+    case KEY1_CLICK:
+      if (stgMainMenuSelectedPos == 1) {
+        MHead = MHead->pLase;
+        pMenu = pMenu->pLase;
+        MTail = MTail->pLase;
+        stgMainMenuSelectedPos = 1;
+        ClrScreenFlag = 1;
+      } else {
+        hal_Oled_ShowString(0, 14 * stgMainMenuSelectedPos, pMenu->pModeType, 8,
+                            1);
+        hal_Oled_Refresh();
+        pMenu = pMenu->pLase;
+        stgMainMenuSelectedPos--;
+      }
+      break;
+    case KEY2_CLICK:
+      if (stgMainMenuSelectedPos == 4) {
+        MHead = MHead->pNext;
+        pMenu = pMenu->pNext;
+        MTail = pMenu;
+        stgMainMenuSelectedPos = 4;
+        ClrScreenFlag = 1;
+      } else {
+        hal_Oled_ShowString(0, 14 * stgMainMenuSelectedPos, pMenu->pModeType, 8,
+                            1);
+        hal_Oled_Refresh();
+        pMenu = pMenu->pNext;
+        stgMainMenuSelectedPos++;
+      }
+      break;
+    case KEY5_CLICK_RELEASE:
+      pModeMenu = &generalModeMenu[GNL_MENU_DESKTOP];
+      pModeMenu->refreshScreenCmd = SCREEN_CMD_RESET;
+      break;
+    }
+  }
+}
+
+// 探测器配对菜单处理函数
+static void stgMenu_LearnSensorCBS(void) {}
+
+// 探测器列表菜单处理函数
+static void stgMenu_DTCListCBS(void) {}
+
+// wifi配网菜单处理函数
+
+static void stgMenu_WifiCBS(void) {}
+
+// 设备信息菜单处理函数
+static void stgMenu_MachineInfoCBS(void) {}
+
+// 恢复出厂设置菜单处理函数
+static void stgMenu_FactorySettingsCBS(void) {}
 
 //-----------------驱动层回调处理函数------------------------
 

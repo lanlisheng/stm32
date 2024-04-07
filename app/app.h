@@ -35,6 +35,17 @@ typedef enum {
   GNL_MENU_SUM,
 } GENERAL_MENU_LIST; // 普通菜单列表
 
+// 设置菜单列表ID
+typedef enum {
+  STG_MENU_MAIN_SETTING,     // 0
+  STG_MENU_LEARNING_SENSOR,  // 1
+  STG_MENU_DTC_LIST,         // 2
+  STG_MENU_WIFI,             // 3
+  STG_MENU_MACHINE_INFO,     // 4
+  STG_MENU_FACTORY_SETTINGS, // 5
+  STG_MENU_SUM               // 6
+} STG_MENU_LIST;             // 普通菜单列表
+
 typedef struct MODE_MENU {
   uint8_t ID;           // 菜单唯一id号
   MODE_POS menuPos;     // 当前菜单的位置信息
