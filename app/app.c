@@ -123,6 +123,20 @@ void showSystemTime(void) {
 }
 
 static void menuInit(void) {
+  int i = 0;
+  settingModeMenu[1].pLase = &settingModeMenu[STG_MENU_SUM - 1];
+  settingModeMenu[1].pNext = &settingModeMenu[2];
+  settingModeMenu[1].pParent = &settingModeMenu[STG_MENU_MAIN_SETTING];
+  for (i = 2; i < STG_MENU_SUM - 1; i++) {
+    settingModeMenu[i].pLase = &settingModeMenu[i - 1];
+    settingModeMenu[i].pNext = &settingModeMenu[i + 1];
+    settingModeMenu[i].pParent = &settingModeMenu[STG_MENU_MAIN_SETTING];
+  }
+  settingModeMenu[STG_MENU_SUM - 1].pLase = &settingModeMenu[i - 1];
+  settingModeMenu[STG_MENU_SUM - 1].pNext = &settingModeMenu[1];
+  settingModeMenu[STG_MENU_SUM - 1].pParent =
+      &settingModeMenu[STG_MENU_MAIN_SETTING];
+
   pModeMenu = &generalModeMenu[GNL_MENU_DESKTOP];
   pModeMenu->refreshScreenCmd = SCREEN_CMD_RESET;
 }
