@@ -11,6 +11,22 @@
 #ifndef APP_H_
 #define APP_H_
 #include "stdint.h"
+
+#define SENSOR_CODE_DOOR_OPEN 0x0A   // 开门
+#define SENSOR_CODE_DOOR_CLOSE 0x0E  // 关门
+#define SENSOR_CODE_DOOR_TAMPER 0x07 // 防拆,预留
+#define SENSOR_CODE_DOOR_LOWPWR 0x06 // 低压
+
+// 遥控器 EV1527编码
+#define SENSOR_CODE_REMOTE_ENARM 0x02
+#define SENSOR_CODE_REMOTE_DISARM 0x01
+#define SENSOR_CODE_REMOTE_HOMEARM 0x04
+#define SENSOR_CODE_REMOTE_SOS 0x08
+
+#define SENSOR_CODE_PIR 0x03
+#define SENSOR_CODE_PIR_TAMPER 0x0B
+#define SENSOR_CODE_PIR_LOWPWR 0x05
+
 // 菜单相关声明区域
 typedef enum {
   SCREEN_CMD_NULL,    // 无用指令
@@ -57,7 +73,7 @@ typedef struct MODE_MENU {
   struct MODE_MENU *pLase;   // 指向上一个选项
   struct MODE_MENU *pNext;   // 指向下一个选项
   struct MODE_MENU *pParent; // 指向父级选项
-  struct MODE_MENU *p;       // 指向子级选项
+  struct MODE_MENU *pChild;  // 指向子级选项
 } stu_mode_menu;
 
 typedef struct SYSTEM_TIME {

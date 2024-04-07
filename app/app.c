@@ -6,6 +6,7 @@
 #include "hal_led.h"
 #include "hal_oled.h"
 #include "hal_rfd.h"
+#include "para.h"
 #include "stdint.h"
 
 static void KeyEventHandle(KEY_VALUE_TYPEDEF keys);
@@ -50,7 +51,7 @@ void AppInit(void) {
   hal_OledInit();
   hal_BeepInit();
   hal_eepromInit();
-  // ParaInit();
+  ParaInit();
   menuInit();
   QueueEmpty(RFDRcvMsg);
   hal_KeyScanCBSRegister(KeyEventHandle);
@@ -232,6 +233,11 @@ static void stgMenu_MainMenuCBS(void) {
       pModeMenu = &generalModeMenu[GNL_MENU_DESKTOP];
       pModeMenu->refreshScreenCmd = SCREEN_CMD_RESET;
       break;
+    case KEY6_CLICK_RELEASE:
+      pModeMenu->pChild = pMenu;
+      pModeMenu = pModeMenu->pChild;
+      pModeMenu->refreshScreenCmd = SCREEN_CMD_RESET;
+      break;
     }
   }
   if (bpMenu != pMenu) {
@@ -259,8 +265,99 @@ static void stgMenu_MainMenuCBS(void) {
 }
 
 // 探测器配对菜单处理函数
-static void stgMenu_LearnSensorCBS(void) {}
+static void stgMenu_LearnSensorCBS(void) {
+  uint8_t keys, dat, tBuff[3];
+  static uint8_t PairingComplete = 0;
+  static uint16_t Timer = 0;
+  Stu_DTC stuTempDevice;
 
+  if (pModeMenu->refreshScreenCmd == SCREEN_CMD_RESET) {
+    pModeMenu->refreshScreenCmd = SCREEN_CMD_NULL;
+    QueueEmpty(RFDRcvMsg);
+    hal_Oled_Clear();
+    hal_Oled_ShowString(28, 0, "Learning DTC", 12, 1);
+    hal_Oled_ShowString(43, 28, "Pairing...", 8, 1);
+    hal_Oled_Refresh();
+
+    keys = 0xFF;
+    PairingComplete = 0;
+    Timer = 0;
+  }
+  if (QueueDataLen(RFDRcvMsg) && (!PairingComplete)) {
+    QueueDataOut(RFDRcvMsg, &dat);
+    if (dat == '#') {
+      QueueDataOut(RFDRcvMsg, &tBuff[2]);
+      QueueDataOut(RFDRcvMsg, &tBuff[1]);
+      QueueDataOut(RFDRcvMsg, &tBuff[0]);
+      hal_Oled_ClearArea(0, 28, 128, 36); // 清屏
+      stuTempDevice.Code[2] = tBuff[2];
+      stuTempDevice.Code[1] = tBuff[1];
+      stuTempDevice.Code[0] = tBuff[0];
+      if ((stuTempDevice.Code[0] == SENSOR_CODE_DOOR_OPEN) ||
+          (stuTempDevice.Code[0] == SENSOR_CODE_DOOR_CLOSE) ||
+          (stuTempDevice.Code[0] == SENSOR_CODE_DOOR_TAMPER) ||
+          (stuTempDevice.Code[0] == SENSOR_CODE_DOOR_LOWPWR)) {
+        stuTempDevice.DTCType = DTC_DOOR;
+      } else if ((stuTempDevice.Code[0] == SENSOR_CODE_REMOTE_ENARM) ||
+                 (stuTempDevice.Code[0] == SENSOR_CODE_REMOTE_DISARM) ||
+                 (stuTempDevice.Code[0] == SENSOR_CODE_REMOTE_HOMEARM) ||
+                 (stuTempDevice.Code[0] == SENSOR_CODE_REMOTE_SOS)) {
+        stuTempDevice.DTCType = DTC_REMOTE;
+      } else if ((stuTempDevice.Code[0] == SENSOR_CODE_PIR) ||
+                 (stuTempDevice.Code[0] == SENSOR_CODE_PIR_LOWPWR) ||
+                 (stuTempDevice.Code[0] == SENSOR_CODE_PIR_TAMPER)) {
+        stuTempDevice.DTCType = DTC_PIR_MOTION;
+      }
+      stuTempDevice.ZoneType = ZONE_TYP_1ST;
+      if (AddDtc(&stuTempDevice) != 0xFF) {
+        switch (stuTempDevice.DTCType) {
+        case DTC_DOOR:
+          hal_Oled_ShowString(34, 28, "Success!", 8, 1);
+          hal_Oled_ShowString(16, 36, "Added door dtc..", 8, 1);
+          break;
+        case DTC_REMOTE:
+          hal_Oled_ShowString(34, 28, "Success!", 8, 1);
+          hal_Oled_ShowString(7, 36, "Added remote dtc..", 8, 1);
+          break;
+        case DTC_PIR_MOTION:
+          hal_Oled_ShowString(34, 28, "Success!", 8, 1);
+          hal_Oled_ShowString(19, 36, "Added pir dtc..", 8, 1);
+          break;
+        }
+        hal_Oled_Refresh();
+        PairingComplete = 1;
+        Timer = 0;
+      } else {
+        hal_Oled_ShowString(34, 28, "Fail...", 8, 1);
+        hal_Oled_Refresh();
+      }
+    }
+  }
+  if (pModeMenu->keyVal != 0xff) {
+    keys = pModeMenu->keyVal;
+    pModeMenu->keyVal = 0xFF;
+    switch (keys) {
+    case KEY5_CLICK_RELEASE:
+      pModeMenu = pModeMenu->pParent;
+      pModeMenu->refreshScreenCmd = SCREEN_CMD_RECOVER;
+      break;
+    case KEY5_LONG_PRESS:
+      pModeMenu = &generalModeMenu[GNL_MENU_DESKTOP];
+      ;
+      ;
+      pModeMenu->refreshScreenCmd = SCREEN_CMD_RESET;
+      break;
+    }
+  }
+  if (PairingComplete) {
+    Timer++;
+    if (Timer > 150) {
+      Timer = 0;
+      pModeMenu = pModeMenu->pParent;
+      pModeMenu->refreshScreenCmd = SCREEN_CMD_RESET;
+    }
+  }
+}
 // 探测器列表菜单处理函数
 static void stgMenu_DTCListCBS(void) {}
 
