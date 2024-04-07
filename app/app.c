@@ -165,7 +165,7 @@ static void stgMenu_MainMenuCBS(void) {
   static uint8_t stgMainMenuSelectedPos = 0;
   if (pModeMenu->refreshScreenCmd == SCREEN_CMD_RESET) {
     pModeMenu->refreshScreenCmd = SCREEN_CMD_NULL;
-    pMenu = &settingModeMenu[0];
+    pMenu = &settingModeMenu[STG_MENU_MAIN_SETTING];
     hal_Oled_Clear();
 
     hal_Oled_ShowString(37, 0, pMenu->pModeType, 12, 1);
@@ -218,6 +218,28 @@ static void stgMenu_MainMenuCBS(void) {
       pModeMenu = &generalModeMenu[GNL_MENU_DESKTOP];
       pModeMenu->refreshScreenCmd = SCREEN_CMD_RESET;
       break;
+    }
+  }
+  if (bpMenu != pMenu) {
+    bpMenu = pMenu;
+    if (ClrScreenFlag) {
+      ClrScreenFlag = 0;
+      pMenu = MHead;
+      hal_Oled_ClearArea(0, 14, 128, 50);
+      hal_Oled_Refresh();
+      for (int i = 1; i < 5; i++) {
+        hal_Oled_ShowString(0, 14 * i, pMenu->pModeType, 8, 1);
+        hal_Oled_Refresh();
+        pMenu = pMenu->pNext;
+      }
+      pMenu = bpMenu;
+      hal_Oled_ShowString(0, 14 * stgMainMenuSelectedPos, pMenu->pModeType, 8,
+                          0);
+      hal_Oled_Refresh();
+    } else {
+      hal_Oled_ShowString(0, 14 * stgMainMenuSelectedPos, pMenu->pModeType, 8,
+                          0);
+      hal_Oled_Refresh();
     }
   }
 }
