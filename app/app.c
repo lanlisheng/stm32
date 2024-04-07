@@ -194,6 +194,15 @@ static void stgMenu_MainMenuCBS(void) {
     ClrScreenFlag = 1;
     stgMainMenuSelectedPos = 1;
     keys = 0xFF;
+  } else if (pModeMenu->refreshScreenCmd == SCREEN_CMD_RECOVER) {
+    pModeMenu->refreshScreenCmd = SCREEN_CMD_NULL;
+    hal_Oled_Clear();
+
+    hal_Oled_ShowString(37, 0, settingModeMenu[0].pModeType, 12, 1);
+    hal_Oled_Refresh();
+    keys = 0xFF;
+    ClrScreenFlag = 1;
+    bpMenu = 0;
   }
   if (pModeMenu->keyVal != 0xFF) {
     keys = pModeMenu->keyVal;
@@ -343,8 +352,6 @@ static void stgMenu_LearnSensorCBS(void) {
       break;
     case KEY5_LONG_PRESS:
       pModeMenu = &generalModeMenu[GNL_MENU_DESKTOP];
-      ;
-      ;
       pModeMenu->refreshScreenCmd = SCREEN_CMD_RESET;
       break;
     }
