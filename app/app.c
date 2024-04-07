@@ -242,7 +242,7 @@ static void stgMenu_FactorySettingsCBS(void) {}
 
 // 按键回调函数
 static void KeyEventHandle(KEY_VALUE_TYPEDEF keys) {
-
+  pModeMenu->keyVal = keys;
   if ((keys == KEY1_CLICK) || (keys == KEY2_CLICK) || (keys == KEY3_CLICK) ||
       (keys == KEY4_CLICK) || (keys == KEY5_CLICK) || (keys == KEY6_CLICK)) {
     LedMsgInput(LED1, LED_LIGHT, 1);
